@@ -1,8 +1,8 @@
 // In one terminal, open:
-// node ./solutions/11b/kappa-multichat.js 1
+// node kappa-multichat.js 1
 
 // In a second terminal, open:
-// node ./solutions/11b/kappa-multichat.js 2
+// node kappa-multichat.js 2
 
 var hyperswarm = require("hyperswarm");
 var crypto = require("crypto");
