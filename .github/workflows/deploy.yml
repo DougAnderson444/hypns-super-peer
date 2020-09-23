@@ -19,7 +19,7 @@ jobs:
         KEY: ${{ secrets.SSHKEY }}
       with:
         source: "."
-        target: "/var/www/mywebsite"
+        target: "/~/hey/"
 
     - name: Executing remote command
       uses: appleboy/ssh-action@master
@@ -28,4 +28,4 @@ jobs:
         USERNAME: ${{ secrets.USERNAME }}
         PORT: ${{ secrets.PORT }}
         KEY: ${{ secrets.SSHKEY }}
-        script: Build
+        script: ls

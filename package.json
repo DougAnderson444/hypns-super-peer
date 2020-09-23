@@ -1,0 +1,23 @@
+{
+  "name": "super-peer",
+  "version": "1.0.0",
+  "description": "Nodejs super peer for kappa-core",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "build": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DougAnderson444/super-peer.git"
+  },
+  "keywords": [
+    "super-peer"
+  ],
+  "author": "Doug Anderson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DougAnderson444/super-peer/issues"
+  },
+  "homepage": "https://github.com/DougAnderson444/super-peer#readme"
+}
