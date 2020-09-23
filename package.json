@@ -27,7 +27,7 @@
     "hyperswarm": "^2.15.0",
     "hyperswarm-web": "^1.0.2",
     "kappa-core": "^6.0.0",
-    "kappa-view-list": "../kappa-view-list",
+    "kappa-view-list": "github:DougAnderson444/kappa-view-list",
     "level-mem": "^5.0.1",
     "multifeed": "github:kappa-db/multifeed",
     "pify": "^5.0.0",
