@@ -23,7 +23,7 @@ var num = process.argv[2];
 
 const store = new Corestore("multichat-store-" + num);
 
-const swarmOpts = { }; // queue: { multiplex: true } // already done in networker for us // bootstrap: false
+const swarmOpts = {}; // queue: { multiplex: true } // already done in networker for us // bootstrap: false
 const swarmNetworker = new SwarmNetworker(store, swarmOpts);
 var network = new MultifeedNetworker(swarmNetworker); // multi + network = swarm
 
@@ -81,7 +81,7 @@ core.ready("chats", () => {
     });
   });
 });
-core.ready(() => {});
+
 function watchStdin(feed) {
   process.stdin.on("data", function (data) {
     feed.append({
@@ -92,3 +92,12 @@ function watchStdin(feed) {
     });
   });
 }
+
+// handle shutdown gracefully
+process.on("SIGINT", async () => {
+  //graceful shutdown
+  console.log('Shutting down...')
+  multi.close()
+  await swarmNetworker.close(); //Shut down the swarm networker.
+  process.exit();
+});
