@@ -3,7 +3,6 @@
 
 const hcrypto = require("hypercore-crypto");
 var crypto = require("crypto");
-var pump = require("pump");
 
 const Corestore = require("corestore");
 const SwarmNetworker = require("@corestore/networker");
@@ -24,7 +23,7 @@ var num = process.argv[2];
 
 const store = new Corestore("multichat-store-" + num);
 
-const swarmOpts = { bootstrap: false }; // queue: { multiplex: true } // already done in networker for us
+const swarmOpts = { }; // queue: { multiplex: true } // already done in networker for us // bootstrap: false
 const swarmNetworker = new SwarmNetworker(store, swarmOpts);
 var network = new MultifeedNetworker(swarmNetworker); // multi + network = swarm
 
