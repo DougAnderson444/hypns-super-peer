@@ -1,3 +1,6 @@
+// This is the old way, with hyperswarm
+// See multichat for new way with corestore
+
 // In one terminal, open:
 // node kappa-multichat.js 1
 
@@ -87,15 +90,16 @@ function doWrite(feed, data) {
 }
 
 function startSwarm(topic) {
-  var swarm = hyperswarm();
+  var swarm = hyperswarm({ queue: { multiplex: true } });
   console.log(`topic: ${topic.toString("hex")}`);
 
   swarm.join(topic, {
-    lookup: true, // find & connect to peers
-    announce: true, // optional- announce self as a connection target
+    lookup: true, // false for long running, https://github.com/hyperswarm/hyperswarm#swarmjointopic-options-onjoin
+    announce: true, // announce self as a connection target
   });
   swarm.on("connection", function (connection, info) {
     console.log("New peer connected!");
-    pump(connection, core.replicate(info.client, { live: true }), connection);
+    const stream = core.replicate(info.client, { live: true })
+    pump(connection, stream, connection);
   });
 }
