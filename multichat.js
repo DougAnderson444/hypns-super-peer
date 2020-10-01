@@ -1,3 +1,8 @@
+// This module runs in node
+// uses the corestore + networker version of multifeed
+// it's connected to the server via github actions
+// Most up to date version here
+
 // node multichat.js 1  // in one terminal
 // node multichat.js 2  // in other terminal
 
@@ -63,19 +68,18 @@ core.ready("chats", () => {
   console.log(`chats ready`);
   core.writer("kappa-local", function (err, feed) {
     if (err) console.error(err);
-    core.api.chats.ready(() => {
-      console.log(`chats api ready`);
-      core.api.chats.tail(5, function (msgs) {
-        console.log("--------------");
-        msgs.forEach(function (msg, i) {
-          console.log(
-            `${i + 1} - ${msg.value.nickname} ${msg.value.timestamp}: ${
-              msg.value.text
-            }`
-          );
-        });
+
+    core.api.chats.tail(5, function (msgs) {
+      console.log("--------------");
+      msgs.forEach(function (msg, i) {
+        console.log(
+          `${i + 1} - ${msg.value.nickname} ${msg.value.timestamp}: ${
+            msg.value.text
+          }`
+        );
       });
     });
+
     feed.ready(() => {
       watchStdin(feed);
     });
@@ -96,8 +100,8 @@ function watchStdin(feed) {
 // handle shutdown gracefully
 process.on("SIGINT", async () => {
   //graceful shutdown
-  console.log('Shutting down...')
-  multi.close()
+  console.log("Shutting down...");
+  multi.close();
   await swarmNetworker.close(); //Shut down the swarm networker.
   process.exit();
 });
