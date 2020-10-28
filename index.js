@@ -7,7 +7,7 @@ const fastify = require('fastify')({
 })
 
 // Declare a route
-fastify.get('/', function (request, reply) {
+fastify.get('/', '0.0.0.0', function (request, reply) {
   reply.send(reply)
 })
 
