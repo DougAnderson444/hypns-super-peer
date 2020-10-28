@@ -1,5 +1,4 @@
 const port = 3001;
-const reply = { hello: 'fastify' }
 
 // Require the framework and instantiate it
 const fastify = require('fastify')({
@@ -8,7 +7,7 @@ const fastify = require('fastify')({
 
 // Declare a route
 fastify.get('/super/', function (request, reply) {
-  reply.send(reply)
+  reply.send({ hello: 'fastify' })
 })
 
 // Run the server!
