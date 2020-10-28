@@ -1,5 +1,5 @@
 const port = 3001;
-const reply = { hello: 'world' }
+const reply = { hello: 'fastify' }
 
 // Require the framework and instantiate it
 const fastify = require('fastify')({
