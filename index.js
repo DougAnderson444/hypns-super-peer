@@ -7,7 +7,7 @@ const fastify = require('fastify')({
 })
 
 // Declare a route
-fastify.get('/', function (request, reply) {
+fastify.get('/super/', function (request, reply) {
   reply.send(reply)
 })
 
