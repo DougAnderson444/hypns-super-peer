@@ -27,6 +27,7 @@
     "dat-encoding": "^5.0.1",
     "dat-sdk": "^2.0.0-8",
     "delay": "^4.4.0",
+    "fastify": "^3.7.0",
     "hypercore-crypto": "^2.1.1",
     "hypermultifeed": "github:DougAnderson444/hypermultifeed",
     "hyperswarm": "^2.15.0",

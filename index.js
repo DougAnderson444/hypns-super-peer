@@ -1,14 +1,21 @@
-const http = require('http');
-
-const hostname = 'localhost';
 const port = 3001;
+const reply = { hello: 'world' }
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end(`Hey there, Doug's World!\n`);
-});
+// Require the framework and instantiate it
+const fastify = require('fastify')({
+  logger: true
+})
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
-});
+// Declare a route
+fastify.get('/', function (request, reply) {
+  reply.send(reply)
+})
+
+// Run the server!
+fastify.listen(port, function (err, address) {
+  if (err) {
+    fastify.log.error(err)
+    process.exit(1)
+  }
+  fastify.log.info(`server listening on ${address}`)
+})
