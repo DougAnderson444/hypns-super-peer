@@ -7,12 +7,12 @@ const fastify = require('fastify')({
 })
 
 // Declare a route
-fastify.get('/', '0.0.0.0', function (request, reply) {
+fastify.get('/', function (request, reply) {
   reply.send(reply)
 })
 
 // Run the server!
-fastify.listen(port, function (err, address) {
+fastify.listen(port, '0.0.0.0', function (err, address) {
   if (err) {
     fastify.log.error(err)
     process.exit(1)
