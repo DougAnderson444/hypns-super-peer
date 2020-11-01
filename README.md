@@ -1,6 +1,9 @@
 # super-peer
-Super peer for pinning kappa-cores
+Super peer for pinning hypns / kappa-cores
 
+## Start server
+
+`node server.js`
 
 ## github deploy 
 
