@@ -5,7 +5,7 @@ const fastify = require('fastify')({
 fastify.register(require('fastify-helmet'))
 
 const keys = new Set(['thetokenhere'])
-fastify.register(require('fastify-bearer-auth'), {keys})
+fastify.register(require('fastify-bearer-auth'), { keys })
 
 const HyPNS = require('hypns')
 const node = new HyPNS({ persist: true })
@@ -30,9 +30,10 @@ const opts = {
     headers: {
       type: 'object',
       properties: {
-        'Authorization': { type: 'string' }
+        Authorization: { type: 'string' }
       },
-      required: ['Authorization']}
+      required: ['Authorization']
+    }
   }
 }
 
@@ -59,30 +60,31 @@ fastify.post('/super/', opts, async (request, reply) => {
 fastify.get('/super/latest/', { schema: { querystring: { rootKey: { type: 'string' } } } },
 
   async (request, reply) => {
-
     const publicKey = request.querystring.rootKey
     const instance = instances.get(publicKey)
 
     console.log('** GET COMPLETE: Latest: ', instance.latest)
 
-    return { latest: instance.latest } // posted: request.body.query.rootKey 
-})
+    return { latest: instance.latest } // posted: request.body.query.rootKey
+  })
 
 // curl -H "Authorization: Bearer thetokenhere" -X GET https://super.peerpiper.io/super/pins/
 fastify.get('/super/pins/', {},
 
   async (request, reply) => {
-
     let out = ''
-    for (let inst of instances.values()) {
-      if(inst.latest)
+    for (const inst of instances.values()) {
+      if (inst.latest) {
         out += `\n<br />${inst.latest.timestamp} ${inst.publicKey}: ${inst.latest.text}`
+      } else {
+        out += `\n<br />${inst.publicKey}: ${inst.latest}`
+      }
     }
 
     reply
-    .code(200)
-    .type('text/html')
-    .send(out)
+      .code(200)
+      .type('text/html')
+      .send(out)
   }
 )
 // Run the server!
