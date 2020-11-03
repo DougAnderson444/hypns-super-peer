@@ -80,9 +80,8 @@ fastify.get('/super/pins/',
   async (request, reply) => {
 
     let out = ''
-    // iterate over [key, value] entries
-    for (let inst of instances) { // the same as of instances.entries()
-      out += `\n<br />${inst.publicKey}: ${inst.latest}`
+    for (let inst of instances.values()) {
+      out += `\n<br />${inst.publicKey}: ${inst.latest}\n`
     }
 
     reply
