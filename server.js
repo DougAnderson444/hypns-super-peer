@@ -1,8 +1,8 @@
 const fastify = require('fastify')({
-  // logger: {
-  //   level: 'info',
-  //   prettyPrint: true
-  // }
+  logger: {
+    level: 'info',
+    prettyPrint: true
+  }
 })
 const bearerAuthPlugin = require('fastify-bearer-auth')
 const keys = new Set([process.env.TOKEN])
