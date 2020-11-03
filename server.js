@@ -66,6 +66,7 @@ fastify.get('/super/latest/', { schema: { querystring: { rootKey: { type: 'strin
 
   async (request, reply) => {
 
+    const publicKey = request.querystring.rootKey
     const instance = instances.get(publicKey)
 
     console.log('** GET COMPLETE: Latest: ', instance.latest)
@@ -73,6 +74,7 @@ fastify.get('/super/latest/', { schema: { querystring: { rootKey: { type: 'strin
     return { latest: instance.latest } // posted: request.body.query.rootKey 
 })
 
+// curl -H "Authorization: Bearer thetokenhere" -X GET https://super.peerpiper.io/super/pins/
 fastify.get('/super/pins/',
 
   async (request, reply) => {
@@ -80,7 +82,7 @@ fastify.get('/super/pins/',
     let out = ''
     // iterate over [key, value] entries
     for (let inst of instances) { // the same as of instances.entries()
-      out += `<br />${inst.publicKey}: ${inst.latest}`
+      out += `\n<br />${inst.publicKey}: ${inst.latest}`
     }
 
     reply
