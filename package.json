@@ -1,6 +1,6 @@
 {
   "name": "super-peer",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Nodejs super peer for HyPNS",
   "main": "index.js",
   "scripts": {
@@ -25,6 +25,7 @@
     "fastify-bearer-auth": "^5.0.2",
     "fastify-cors": "^4.1.0",
     "fastify-env": "^2.1.0",
+    "fastify-helmet": "^5.0.3",
     "fastify-plugin": "^3.0.0",
     "hypns": "^1.4.5"
   },
