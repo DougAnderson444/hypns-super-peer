@@ -1,6 +1,6 @@
 {
   "name": "super-peer",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Nodejs super peer for HyPNS",
   "main": "index.js",
   "scripts": {
@@ -30,6 +30,7 @@
     "hypns": "^1.4.5"
   },
   "devDependencies": {
-    "pino-pretty": "^4.3.0"
+    "pino-pretty": "^4.3.0",
+    "standard": "^16.0.1"
   }
 }
