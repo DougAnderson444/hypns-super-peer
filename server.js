@@ -75,7 +75,8 @@ fastify.get('/super/pins/', {},
 
     let out = ''
     for (let inst of instances.values()) {
-      out += `\n<br />${inst.latest.timestamp} ${inst.publicKey}: ${inst.latest.text}\n`
+      if(inst.latest)
+        out += `\n<br />${inst.latest.timestamp} ${inst.publicKey}: ${inst.latest.text}`
     }
 
     reply
