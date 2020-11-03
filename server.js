@@ -1,6 +1,8 @@
 const fastify = require('fastify')({
   logger: { level: 'info', prettyPrint: true }
 })
+const helmet = require('fastify-helmet')
+fastify.register(helmet)
 
 const bearerAuthPlugin = require('fastify-bearer-auth')
 
@@ -60,18 +62,33 @@ fastify.post('/super/', opts, async (request, reply) => {
   
 })
 
-fastify.get('/latest/', { schema: { querystring: { rootKey: { type: 'string' } } } },
+fastify.get('/super/latest/', { schema: { querystring: { rootKey: { type: 'string' } } } },
 
   async (request, reply) => {
 
-    const publicKey = request.query.rootKey
     const instance = instances.get(publicKey)
 
     console.log('** GET COMPLETE: Latest: ', instance.latest)
 
-    return { latest: instance.latest } // posted: request.body.query.rootKey
-  })
+    return { latest: instance.latest } // posted: request.body.query.rootKey 
+})
 
+fastify.get('/super/pins/',
+
+  async (request, reply) => {
+
+    let out = ''
+    // iterate over [key, value] entries
+    for (let inst of instances) { // the same as of instances.entries()
+      out += `<br />${inst.publicKey}: ${inst.latest}`
+    }
+
+    reply
+    .code(200)
+    .type('text/html')
+    .send(out)
+  }
+)
 // Run the server!
 fastify.listen(port, '::', function (err, address) {
   if (err) {
