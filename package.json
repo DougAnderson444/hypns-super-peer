@@ -24,6 +24,7 @@
     "fastify": "^3.7.0",
     "fastify-bearer-auth": "^5.0.2",
     "fastify-cors": "^4.1.0",
+    "fastify-env": "^2.1.0",
     "fastify-plugin": "^3.0.0",
     "hypns": "^1.4.5"
   },

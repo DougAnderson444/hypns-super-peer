@@ -1,12 +1,10 @@
 const fastify = require('fastify')({
-  logger: {
-    level: 'info',
-    prettyPrint: true
-  }
+  logger: { level: 'info', prettyPrint: true }
 })
-const bearerAuthPlugin = require('fastify-bearer-auth')
-const keys = new Set([process.env.TOKEN])
 
+const bearerAuthPlugin = require('fastify-bearer-auth')
+
+const keys = new Set(['thetokenhere'])
 fastify.register(bearerAuthPlugin, {keys})
 
 const HyPNS = require('hypns')
@@ -54,7 +52,9 @@ fastify.post('/super/', opts, async (request, reply) => {
   
   instances.set(instance.publicKey, instance)
   
-  console.log('** POST COMPLETE ** \n', instance.publicKey, ` instances.size: [${instances.size}]`)
+  console.log('** POST COMPLETE ** \n', instance.publicKey, ` instances.size: [${instances.size}]
+  latest: ${instance.latest}
+  `)
   
   return { latest: instance.latest } // posted: request.body.query.rootKey
   
