@@ -75,7 +75,7 @@ fastify.get('/super/latest/', { schema: { querystring: { rootKey: { type: 'strin
 })
 
 // curl -H "Authorization: Bearer thetokenhere" -X GET https://super.peerpiper.io/super/pins/
-fastify.get('/super/pins/',
+fastify.get('/super/pins/', {},
 
   async (request, reply) => {
 
