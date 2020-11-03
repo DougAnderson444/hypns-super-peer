@@ -7,13 +7,14 @@ const fastify = require('fastify')({
 const bearerAuthPlugin = require('fastify-bearer-auth')
 const keys = new Set([process.env.TOKEN])
 
-// fastify.register(bearerAuthPlugin, {keys})
+fastify.register(bearerAuthPlugin, {keys})
 
 const HyPNS = require('hypns')
 const node = new HyPNS({ persist: true })
 const instances = new Map()
 const port = 3001
 
+// https://www.fastify.io/docs/latest/Validation-and-Serialization/
 const opts = {
   schema: {
     body: {
@@ -26,11 +27,14 @@ const opts = {
         }
       }
     },
-    querystring: {
-      rootKey: { type: 'string' }
-    },
+    querystring: {},
     params: {},
-    headers: {}
+    headers: {
+      type: 'object',
+      properties: {
+        'Authorization': { type: 'string' }
+      },
+      required: ['Authorization']}
   }
 }
 
