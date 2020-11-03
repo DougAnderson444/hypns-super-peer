@@ -1,6 +1,6 @@
 {
   "name": "super-peer",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "Nodejs super peer for HyPNS",
   "main": "index.js",
   "scripts": {
