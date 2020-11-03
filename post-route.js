@@ -1,3 +1,6 @@
+const fp = require('fastify-plugin')
+
+// https://www.fastify.io/docs/latest/Validation-and-Serialization/
 const opts = {
   schema: {
     body: {
@@ -10,44 +13,44 @@ const opts = {
         }
       }
     },
-    querystring: {
-      rootKey: { type: 'string' }
-    },
+    querystring: {},
     params: {},
-    headers: {}
+    headers: {
+      type: 'object',
+      properties: {
+        'Authorization': { type: 'string' }
+      },
+      required: ['Authorization']}
   }
 }
 
-module.exports = function (fastify, options, done) {
+function posting (fastify, opts, done) {
+
+  const keys = new Set(['thetokenhere'])
+  fastify.register(require('fastify-bearer-auth'), {keys})
+
   const instances = []
+  fastify.decorate('instances', instances)
 
   // Declare routes
   fastify.post('/super/', opts, async (request, reply) => {
-    // console.log('*** REQUEST ***\n ', request.body, request.query)
 
-    // start listening on the passed rootKey
     const publicKey = request.body.rootKey
-    console.log('** REQUEST ** ', publicKey)
-    const instance = await options.node.open({ keypair: { publicKey } })
-    instance.on('update', (val) => {
-      console.log('updated value: ', val.text)
-    })
+    const instance = await node.open({ keypair: { publicKey } })
+    
     await instance.ready()
-    instances[instance.publicKey] = instance
-
-    console.log('** COMPLETE ** ', instance.publicKey)
-
-    return { good: 'good', node: 'node' } // posted: request.body.query.rootKey
+    
+    instances.set(instance.publicKey, instance)
+    
+    console.log('** POST COMPLETE ** \n', instance.publicKey, ` instances.size: [${instances.size}]
+    latest: ${instance.latest}
+    `)
+    
+    return { latest: instance.latest } // posted: request.body.query.rootKey
+    
   })
 
-  fastify.get('/latest/', { schema: { querystring: { rootKey: { type: 'string' } } } },
-    async (request, reply) => {
-      const publicKey = request.query.rootKey
-      console.log('** REQUEST ** /latest/', publicKey)
-      const instance = instances[publicKey]
-      console.log('** COMPLETE: Latest: ', instance.latest)
-
-      return { latest: instance.latest } // posted: request.body.query.rootKey
-    })
   done()
 }
+
+module.exports = fp(posting)

@@ -1,13 +1,11 @@
 const fastify = require('fastify')({
   logger: { level: 'info', prettyPrint: true }
 })
-const helmet = require('fastify-helmet')
-fastify.register(helmet)
 
-const bearerAuthPlugin = require('fastify-bearer-auth')
+fastify.register(require('fastify-helmet'))
 
 const keys = new Set(['thetokenhere'])
-fastify.register(bearerAuthPlugin, {keys})
+fastify.register(require('fastify-bearer-auth'), {keys})
 
 const HyPNS = require('hypns')
 const node = new HyPNS({ persist: true })
@@ -45,21 +43,17 @@ fastify.register(require('fastify-cors'), { origin: '*' })
 // })
 
 // Declare routes
-fastify.post('/super/', opts, async (request, reply) => {
+// fastify.register(require('./post-route.js'))
 
+fastify.post('/super/', opts, async (request, reply) => {
   const publicKey = request.body.rootKey
   const instance = await node.open({ keypair: { publicKey } })
-  
   await instance.ready()
-  
   instances.set(instance.publicKey, instance)
-  
   console.log('** POST COMPLETE ** \n', instance.publicKey, ` instances.size: [${instances.size}]
   latest: ${instance.latest}
   `)
-  
   return { latest: instance.latest } // posted: request.body.query.rootKey
-  
 })
 
 fastify.get('/super/latest/', { schema: { querystring: { rootKey: { type: 'string' } } } },
@@ -81,7 +75,7 @@ fastify.get('/super/pins/', {},
 
     let out = ''
     for (let inst of instances.values()) {
-      out += `\n<br />${inst.publicKey}: ${inst.latest}\n`
+      out += `\n<br />${inst.latest.timestamp} ${inst.publicKey}: ${inst.latest.text}\n`
     }
 
     reply
