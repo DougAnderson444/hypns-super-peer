@@ -2,3 +2,4 @@ node_modules
 kappa-multichat-*
 multichat-*
 hypnsapp*
+.env

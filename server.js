@@ -4,6 +4,10 @@ const fastify = require('fastify')({
   //   prettyPrint: true
   // }
 })
+const bearerAuthPlugin = require('fastify-bearer-auth')
+const keys = new Set([process.env.TOKEN])
+
+// fastify.register(bearerAuthPlugin, {keys})
 
 const HyPNS = require('hypns')
 const node = new HyPNS({ persist: true })
@@ -38,22 +42,27 @@ fastify.register(require('fastify-cors'), { origin: '*' })
 
 // Declare routes
 fastify.post('/super/', opts, async (request, reply) => {
+
   const publicKey = request.body.rootKey
   const instance = await node.open({ keypair: { publicKey } })
+  
   await instance.ready()
-  if (instance.latest == null) {
-    console.log('** latest = null, readLatest')
-    await instance.readLatest()
-  }
+  
   instances.set(instance.publicKey, instance)
+  
   console.log('** POST COMPLETE ** \n', instance.publicKey, ` instances.size: [${instances.size}]`)
+  
   return { latest: instance.latest } // posted: request.body.query.rootKey
+  
 })
 
 fastify.get('/latest/', { schema: { querystring: { rootKey: { type: 'string' } } } },
+
   async (request, reply) => {
+
     const publicKey = request.query.rootKey
     const instance = instances.get(publicKey)
+
     console.log('** GET COMPLETE: Latest: ', instance.latest)
 
     return { latest: instance.latest } // posted: request.body.query.rootKey
