@@ -21,22 +21,22 @@ jobs:
         source: "."
         target: "/home/superpeer/hypns/"
 
-    - name: Install script
-      uses: appleboy/scp-action@master
+    - name: Executing remote command
+      uses: appleboy/ssh-action@master
       with:
-        HOST: ${{ secrets.HOST }}
+        host: ${{ secrets.HOST }}
         USERNAME: ${{ secrets.USERNAME }}
         PORT: ${{ secrets.PORT }}
         KEY: ${{ secrets.SSHKEY }}
+        target: "/home/superpeer/hypns/"
         script:  npm i
-        target: "/home/superpeer/hypns/"
 
-    - name: Run script
-      uses: appleboy/scp-action@master
+    - name: Executing remote command
+      uses: appleboy/ssh-action@master
       with:
-        HOST: ${{ secrets.HOST }}
+        host: ${{ secrets.HOST }}
         USERNAME: ${{ secrets.USERNAME }}
         PORT: ${{ secrets.PORT }}
         KEY: ${{ secrets.SSHKEY }}
-        script:  npm run build
         target: "/home/superpeer/hypns/"
+        script:  npm run build
