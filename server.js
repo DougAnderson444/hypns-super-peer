@@ -1,105 +1,134 @@
+require('dotenv').config()
+const path = require('path')
+
 const HyPNS = require('hypns')
-const port = 3001
-const fastify = require('fastify')({
-  logger: { level: 'info', prettyPrint: true }
-})
+const fs = require('fs-extra')
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
+const express = require('express')
+const bodyParser = require('body-parser')
+const cors = require('cors')
 
-fastify.register(require('fastify-helmet'))
-fastify.register(require('fastify-cors'), { origin: '*' })
+/**
+ * Local db to persist pins on reloads
+ */
+const file = '.data/db.json'
+fs.ensureFileSync(file)
+const adapter = new FileSync('.data/db.json')
+const db = low(adapter)
+// Set some defaults
+if (db.get('pins').size().value() < 1) { db.defaults({ pins: {} }).write() }
 
-fastify.register((fastifyInstance, options, done) => {
-  fastifyInstance.decorate('node', new HyPNS({ persist: true }))
-  fastifyInstance.decorate('instances', new Map())
+/**
+ * HYPNS Node and functions
+ */
+const hypnsNode = new HyPNS({ persist: true, applicationName: '.data/hypnsapp' })
+const instances = new Map()
 
-  fastifyInstance.register((fi, options, done) => {
-    // https://www.fastify.io/docs/latest/Validation-and-Serialization/
-    const opts = {
-      schema: {
-        body: {
-          type: 'object',
-          properties: {
-            rootKey: {
-              type: 'string',
-              minLength: 64, // https://json-schema.org/understanding-json-schema/reference/string.html#length
-              maxLength: 64
-            }
-          }
-        },
-        querystring: {},
-        params: {},
-        headers: {
-          type: 'object',
-          properties: {
-            Authorization: { type: 'string' }
-          },
-          required: ['Authorization']
-        }
-      }
-    }
-    const keys = new Set(['thetokenhere'])
-    fi.register(require('fastify-bearer-auth'), { keys }) // only apply token requirement to this fastify instance (fi)
-    fi.post('/super/', opts, async (request, reply) => {
-      const publicKey = request.body.rootKey
-      const instance = await fastifyInstance.node.open({ keypair: { publicKey } })
-      await instance.ready()
-      instance.on('update', (val) => {
-        const lag = (new Date(Date.now())) - (new Date(instance.latest.timestamp))
-        console.log('Update ', instance.publicKey, ` latest:${instance.latest.timestamp} ${instance.latest.text} [${new Date(lag).getSeconds()} sec]`)
-      })
-      fastifyInstance.instances.set(instance.publicKey, instance)
-      console.log('** POST COMPLETE ** \n', instance.publicKey, ` instances.size: [${fastifyInstance.instances.size}]`)
-      reply.send({ latest: instance.latest }) // posted: request.body.query.rootKey
-    })
+const setUp = async (publicKey) => {
+  // skip if it's already configured on this node
+  if (hypnsNode.instances.has(publicKey)) {
+    return hypnsNode.instances.get(publicKey).latest
+  }
+  const instance = await hypnsNode.open({ keypair: { publicKey } })
+  await instance.ready()
 
-    done()
+  // skip if the instance is already listening
+  if (instance.listenerCount('update') > 0) return
+
+  instance.on('update', (val) => {
+    const note = `Update ${instance.publicKey}, latest: ${instance.latest ? instance.latest.timestamp : null}, ${instance.latest ? instance.latest.text : null}. `
+    console.log(note)
+    db.set(`pins.${publicKey}`, instance.latest)
+      .write()
+    // feedEmitter.emit('feed', note)
   })
 
-  // curl -H "Authorization: Bearer thetokenhere" -X GET https://super.peerpiper.io/super/pins/
-  fastifyInstance.get('/super/pins/',
-    async (request, reply) => {
-      let out = ''
-      for (const inst of fastifyInstance.instances.values()) {
-        if (inst.latest) {
-          out += `\n<br />${inst.latest.timestamp} ${inst.publicKey}: ${inst.latest.text}`
-        } else {
-          out += `\n<br />${inst.publicKey}: ${inst.latest}`
-        }
-      }
+  instances.set(instance.publicKey, instance)
+  db.set(`pins.${publicKey}`, instance.latest).write()
+  const note = `** Setup COMPLETE: ', ${instance.publicKey}, pins.size: [${db.get('pins').size().value()}]`
+  console.log(note)
+  // feedEmitter.emit('feed', note)
+  return instance.latest
+}
 
-      console.log('** Pins/Out: ', out)
+// load list from storage and initialize the node
+const init = async () => {
+  const pins = db.get('pins').value() // Find all publicKeys pinned in the collection
+  Object.keys(pins).forEach((key) => {
+    setUp(key)
+  })
+}
 
-      reply
-        .code(200)
-        .type('text/html')
-        .send(out)
-    }
-  )
+init()
 
-  fastifyInstance.get('/super/latest/', { schema: { querystring: { rootKey: { type: 'string' } } } },
+/**
+ * Enable server to interact with the HyPNS Node and show streams of updates
+ */
+const app = express()
+const port = process.env.PORT || 3001
 
-    async (request, reply) => {
-      const publicKey = request.querystring.rootKey
-      const instance = fastifyInstance.instances.get(publicKey)
+app.use(bodyParser.json())
+app.use(express.static('public'))
+app.use(cors())
 
-      console.log('** GET COMPLETE: Latest: ', instance.latest)
-
-      return { latest: instance.latest } // posted: request.body.query.rootKey
-    }
-  )
-
-  done()
+app.get('/', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'public', 'index.html'))
 })
 
-// fastify.register(require('./initApp'))
-// fastify.register(require('./post-route'), parent => {
-//   return { node: parent.node }
-// })
+app.post('/pin/', verifyToken, async (request, response) => {
+  console.log('Request token', request.token)
+  if (request.token !== process.env.TOKEN) response.sendStatus(403)
 
-// Run the server!
-fastify.listen(port, '::', function (err, address) {
-  if (err) {
-    fastify.log.error(err)
-    process.exit(1)
+  const publicKey = request.body.rootKey
+  const latest = await setUp(publicKey)
+  response.json({ latest })
+})
+
+// TODO: Should also validate the rootKey
+function verifyToken(req, res, next) {
+  const bearerHeader = req.headers.authorization
+
+  if (bearerHeader) {
+    const bearer = bearerHeader.split(' ')
+    const bearerToken = bearer[1]
+    req.token = bearerToken
+    next()
+  } else {
+    // Forbidden
+    res.sendStatus(403)
   }
-  fastify.log.info(`server listening on ${address}`)
+}
+
+app.get('/pins', (request, response) => {
+  const pins = db.get('pins').value() // Find all publicKeys pinned in the collection
+  response.json(pins) // sends pins back to the page
+})
+
+app.get('/feed', (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache')
+  res.setHeader('Content-Type', 'text/event-stream')
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Connection', 'keep-alive')
+  res.flushHeaders() // flush the headers to establish SSE with client
+
+  const counter = 0
+  const pinsWriter = () => {
+    res.write('event: update\n\n') // res.write() instead of res.send()
+    res.write(`data: ${JSON.stringify(db.get('pins').value())}\n\n`) // res.write() instead of res.send()
+    res.write(`id: ${counter}\n\n`)
+  }
+  // const interValID = setInterval(writeCounter, 1000)
+  const interValID = setInterval(pinsWriter, 2000)
+
+  // If client closes connection, stop sending events
+  res.on('close', () => {
+    console.log('client dropped me')
+    clearInterval(interValID)
+    res.end()
+  })
+})
+
+const listener = app.listen(port, () => {
+  console.log('Server is up at ', listener.address())
 })

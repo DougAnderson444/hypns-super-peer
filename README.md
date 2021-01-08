@@ -1,17 +1,15 @@
-# super-peer
-Super peer for pinning hypns / kappa-cores
+# HyPNS Super-Peer
+
+Super peer for pinning HyPNS peers.
 
 ## Start server
 
-`node server.js`
+`npm run start`
 
-## github deploy 
+## Server Deploy
 
-npm install --production npm run build pm2 restart hey 3001
+This code can be deployed via Github action with a push. 
 
-Super peer needs to add a discoveryKey in HyPNS node when posted
+## See status online
 
-1. Post discoveryKey to super-peer HyPNS node
-2. Open an instance on that node for that dicoveryKey
-3. Should pin & propogate the data
-
+A Svelte page has been configured so the page displays all pins. 

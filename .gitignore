@@ -1,5 +1,5 @@
-node_modules
-kappa-multichat-*
-multichat-*
-hypnsapp*
+/node_modules/
+/public/build/
 .env
+.DS_Store
+.data
