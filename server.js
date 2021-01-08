@@ -37,7 +37,7 @@ const setUp = async (publicKey) => {
   if (instance.listenerCount('update') > 0) return
 
   instance.on('update', (val) => {
-    const note = `Update ${instance.publicKey}, latest: ${instance.latest ? instance.latest.timestamp : null}, ${instance.latest ? instance.latest.text : null}. `
+    const note = `Update ${instance.publicKey}, latest: ${instance.latest ? instance.latest.timestamp : null}, ${instance.latest ? instance.latest.text : null}`
     console.log(note)
     db.set(`pins.${publicKey}`, instance.latest)
       .write()
@@ -77,8 +77,7 @@ app.get('/', (req, res) => {
 })
 
 app.post('/pin/', verifyToken, async (request, response) => {
-  console.log('Request token', request.token)
-  if (request.token !== process.env.TOKEN) response.sendStatus(403)
+  if (request.token !== process.env.TOKEN) { response.sendStatus(403) }
 
   const publicKey = request.body.rootKey
   const latest = await setUp(publicKey)
@@ -86,7 +85,7 @@ app.post('/pin/', verifyToken, async (request, response) => {
 })
 
 // TODO: Should also validate the rootKey
-function verifyToken(req, res, next) {
+function verifyToken (req, res, next) {
   const bearerHeader = req.headers.authorization
 
   if (bearerHeader) {
