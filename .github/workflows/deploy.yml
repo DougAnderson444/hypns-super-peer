@@ -19,7 +19,7 @@ jobs:
         KEY: ${{ secrets.SSHKEY }}
       with:
         source: "."
-        target: "/home/superpeer/server/"
+        target: "/home/superpeer/hypns/"
 
     - name: Executing remote command
       uses: appleboy/ssh-action@master
