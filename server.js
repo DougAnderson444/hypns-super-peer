@@ -9,6 +9,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 
+const proxy = require('./proxy')
+
 /**
  * Local db to persist pins on reloads
  */
@@ -58,6 +60,13 @@ const init = async () => {
   Object.keys(pins).forEach((key) => {
     setUp(key)
   })
+
+  await hypnsNode.init() // sets up the corestore-networker / hyperswarm instance
+
+  /**
+   * Also set up a hyperswarm proxy server using the HyPNS hyperswarm instance
+   */
+  proxy({ network: hypnsNode.swarmNetworker.swarm })
 }
 
 init()
@@ -118,7 +127,7 @@ app.get('/feed', (req, res) => {
     res.write(`id: ${counter}\n\n`)
   }
   // const interValID = setInterval(writeCounter, 1000)
-  const interValID = setInterval(pinsWriter, 2000)
+  const interValID = setInterval(pinsWriter, 5000)
 
   // If client closes connection, stop sending events
   res.on('close', () => {
