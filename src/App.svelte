@@ -18,6 +18,20 @@
   });
 </script>
 
+<main>
+  <h1>A list of pinned Public Keys</h1>
+  {#if pins}
+    {#key pins}
+      <br />Last update:
+      {new Date(Date.now()).toLocaleString()}
+      <!-- destroyed and recreated whenever `pins` changes Object.entries -->
+      {#each Object.entries(pins) as [key, values]}
+        <li>{key} {values ? values.text : "Pending"}</li>
+      {/each}
+    {/key}
+  {:else}...loading{/if}
+</main>
+
 <style>
   main {
     text-align: left;
@@ -39,18 +53,3 @@
     }
   }
 </style>
-
-<main>
-  <h1>A list of pinned Public Keys</h1>
-  {#if pins}
-    <p>Users: <br />Here they are:</p>
-    {#key pins}
-      <br />Last update:
-      {new Date(Date.now()).toLocaleString()}
-      <!-- destroyed and recreated whenever `pins` changes Object.entries -->
-      {#each Object.entries(pins) as [key, values]}
-        <li>{key} {values.text}</li>
-      {/each}
-    {/key}
-  {:else}...loading{/if}
-</main>
