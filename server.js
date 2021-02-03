@@ -56,17 +56,12 @@ const setUp = async (publicKey) => {
 
 // load list from storage and initialize the node
 const init = async () => {
+  await hypnsNode.init() // sets up the corestore-networker / hyperswarm instance
+
   const pins = db.get('pins').value() // Find all publicKeys pinned in the collection
   Object.keys(pins).forEach((key) => {
     setUp(key)
   })
-
-  await hypnsNode.init() // sets up the corestore-networker / hyperswarm instance
-
-  /**
-   * Also set up a hyperswarm proxy server using the HyPNS hyperswarm instance
-   */
-  proxy({ network: hypnsNode.swarmNetworker.swarm })
 }
 
 init()
@@ -140,3 +135,8 @@ app.get('/feed', (req, res) => {
 const listener = app.listen(port, () => {
   console.log('Server is up at ', listener.address())
 })
+
+/**
+  * Also set up a hyperswarm-web proxy server
+  */
+proxy()
