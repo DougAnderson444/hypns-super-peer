@@ -59,11 +59,6 @@ const setUp = async (publicKey) => {
 const init = async () => {
   await hypnsNode.init() // sets up the corestore-networker / hyperswarm instance
 
-  /**
-    * Also set up a hyperswarm-web proxy server for when this is run at home
-    */
-  proxy({ network: hypnsNode.swarmNetworker.swarm })
-
   const pins = db.get('pins').value() // Find all publicKeys pinned in the collection
   Object.keys(pins).forEach((key) => {
     setUp(key)
@@ -89,7 +84,10 @@ app.get('/', (req, res) => {
  * Pin if they have a TOKEN that matches the one in the .env file
  */
 app.post('/pin/', verifyToken, async (request, response) => {
-  if (request.token !== process.env.TOKEN) { response.sendStatus(403) }
+  if (request.token !== process.env.TOKEN) {
+    response.sendStatus(403)
+    return
+  }
 
   const publicKey = request.body.rootKey
   const latest = await setUp(publicKey)
@@ -175,3 +173,8 @@ app.post('/deploy', (request, response) => {
 const listener = app.listen(port, () => {
   console.log('Server is up at ', listener.address())
 })
+
+/**
+    * Also set up a hyperswarm-web proxy server for when this is run at home
+    */
+proxy() // { network: hypnsNode.swarmNetworker.swarm } // TODO: debug TypeError: this.network.bind is not a function
