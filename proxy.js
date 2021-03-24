@@ -37,7 +37,6 @@ module.exports = async ({ network = {}, port = DEFAULT_PORT }) => {
   } else {
     opts = { network }
   }
-  console.log({ opts })
 
   const server = http.createServer(function onRequest (req, res) {
     send(req, INDEX_HTML_LOCATION)
