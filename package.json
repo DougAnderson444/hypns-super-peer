@@ -1,6 +1,6 @@
 {
   "name": "hypns-super-peer",
-  "version": "4.0.4",
+  "version": "4.0.5",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
@@ -31,5 +31,8 @@
     "url": "https://github.com/DougAnderson444/hypns-super-peer/issues"
   },
   "homepage": "https://github.com/DougAnderson444/hypns-super-peer#readme",
-  "repository": "https://github.com/DougAnderson444/hypns-super-peer"
+  "repository": "https://github.com/DougAnderson444/hypns-super-peer",
+  "engines": {
+    "node": ">=12.21 <15"
+  }
 }
