@@ -10,6 +10,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 
 const proxy = require('./proxy')
+const { execSync } = require('child_process')
 
 /**
  * Local db to persist pins on reloads
@@ -135,6 +136,30 @@ app.get('/feed', (req, res) => {
     clearInterval(interValID)
     res.end()
   })
+})
+
+/**
+* Enable deploy to glitch.com
+*/
+app.post('/deploy', (request, response) => {
+  if (request.query.secret !== process.env.SECRET) {
+    response.status(401).send()
+    return
+  }
+
+  if (request.body.ref !== 'refs/heads/master') {
+    response.status(200).send('Push was not to master branch, so did not deploy.')
+    return
+  }
+
+  const repoUrl = request.body.repository.git_url
+
+  console.log('Fetching latest changes.')
+  const output = execSync(
+    `git checkout -- ./ && git pull -X theirs ${repoUrl} glitch && refresh`
+  ).toString()
+  console.log(output)
+  response.status(200).send()
 })
 
 const listener = app.listen(port, () => {
