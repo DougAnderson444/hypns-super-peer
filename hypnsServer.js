@@ -79,13 +79,15 @@ const app = express()
 const port = process.env.PORT || 3001
 
 app.use(bodyParser.json())
-app.use(express.static('public'))
+app.use(express.static(path.join(__dirname, '/public')))
 app.use(cors())
 
 app.get('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'public', 'index.html'))
+  res.sendFile(path.resolve(__dirname, '/public', 'index.html'))
 })
-
+/**
+ * Pin if they have a TOKEN that matches the one in the .env file
+ */
 app.post('/pin/', verifyToken, async (request, response) => {
   if (request.token !== process.env.TOKEN) { response.sendStatus(403) }
 
@@ -113,7 +115,9 @@ app.get('/pins', (request, response) => {
   const pins = db.get('pins').value() // Find all publicKeys pinned in the collection
   response.json(pins) // sends pins back to the page
 })
-
+/**
+ * Stream a feed to updates about who is pinned
+ */
 app.get('/feed', (req, res) => {
   res.setHeader('Cache-Control', 'no-cache')
   res.setHeader('Content-Type', 'text/event-stream')
