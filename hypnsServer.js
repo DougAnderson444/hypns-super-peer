@@ -162,6 +162,12 @@ app.post('/deploy', (request, response) => {
   const output = execSync(
     `git checkout -- ./ && git pull -X theirs ${repoUrl} master && refresh`
   ).toString()
+
+  require('child_process').spawn('npm', ['run', 'build'], {
+    stdio: ['ignore', 'inherit', 'inherit'],
+    shell: true
+  })
+
   console.log(output)
   response.status(200).send()
 })
