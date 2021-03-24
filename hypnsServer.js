@@ -156,7 +156,7 @@ app.post('/deploy', (request, response) => {
 
   console.log('Fetching latest changes.')
   const output = execSync(
-    `git checkout -- ./ && git pull -X theirs ${repoUrl} glitch && refresh`
+    `git checkout -- ./ && git pull -X theirs ${repoUrl} master && refresh`
   ).toString()
   console.log(output)
   response.status(200).send()
