@@ -1,6 +1,6 @@
 {
   "name": "hypns-super-peer",
-  "version": "4.0.3",
+  "version": "4.0.4",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
