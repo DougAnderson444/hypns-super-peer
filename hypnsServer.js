@@ -86,7 +86,7 @@ app.get('/', (req, res) => {
 app.post('/pin/', verifyToken, async (request, response) => {
   if (request.token !== process.env.TOKEN) {
     response.sendStatus(403)
-    return
+    return { response: 'Invalid Token' }
   }
 
   const publicKey = request.body.rootKey
