@@ -40,7 +40,8 @@ const setUp = async (publicKey) => {
   if (instance.listenerCount('update') > 0) return
 
   instance.on('update', (val) => {
-    const note = `Update ${instance.publicKey}, latest: ${instance.latest ? instance.latest.timestamp : null}, ${instance.latest ? instance.latest.text : null}`
+    const note = `Update ${instance.publicKey}, 
+    latest: ${instance.latest ? JSON.stringify(instance.latest) : null}`
     console.log(note)
     db.set(`pins.${publicKey}`, instance.latest)
       .write()

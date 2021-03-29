@@ -25,8 +25,8 @@
       <br />Last update:
       {new Date(Date.now()).toLocaleString()}
       <!-- destroyed and recreated whenever `pins` changes Object.entries -->
-      {#each Object.entries(pins) as [key, values]}
-        <li>{key} {values ? values.text : "Pending"}</li>
+      {#each Object.entries(pins) as [key, value]}
+        <li>{key} {value ? JSON.stringify(value) : "Pending"}</li>
       {/each}
     {/key}
   {:else}...loading{/if}
