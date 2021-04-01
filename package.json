@@ -1,6 +1,6 @@
 {
   "name": "hypns-super-peer",
-  "version": "4.0.9",
+  "version": "4.1.0",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
@@ -23,7 +23,7 @@
     "express": "^4.17.1",
     "fs-extra": "^9.0.1",
     "hyperswarm-web": "^2.1.1",
-    "hypns": "^2.0.0",
+    "hypns": "^2.0.2",
     "lowdb": "^1.0.0"
   },
   "license": "MIT-with-Commons-Clause",
