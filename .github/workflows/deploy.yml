@@ -30,14 +30,15 @@ jobs:
         KEY: ${{ secrets.SSHKEY }}
         script:  npm i
 
-    - name: Executing remote command
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        USERNAME: ${{ secrets.USERNAME }}
-        PORT: ${{ secrets.PORT }}
-        KEY: ${{ secrets.SSHKEY }}
-        script:  npm run build
+    # build is now part of npm run start, no need to do it twice?
+    # - name: Executing remote command
+    #   uses: appleboy/ssh-action@master
+    #   with:
+    #     host: ${{ secrets.HOST }}
+    #     USERNAME: ${{ secrets.USERNAME }}
+    #     PORT: ${{ secrets.PORT }}
+    #     KEY: ${{ secrets.SSHKEY }}
+    #     script:  npm run build
 
     - name: Executing remote command
       uses: appleboy/ssh-action@master
