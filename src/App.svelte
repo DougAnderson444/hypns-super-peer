@@ -6,7 +6,10 @@
     sse.onmessage = (event) => {
       let response = JSON.parse(event.data);
       console.log(`msg rxd: `, { response });
-      if (!response) return;
+      if (!response) {
+        console.log(`no response, returning`);
+        return;
+      }
       pins = response;
     };
 
@@ -26,7 +29,7 @@
       {new Date(Date.now()).toLocaleString()}
       <!-- destroyed and recreated whenever `pins` changes Object.entries -->
       {#each Object.entries(pins) as [key, value]}
-        <li>{key} {value ? JSON.stringify(value) : "Pending"}</li>
+        <li>{key}: {value ? JSON.stringify(value) : "Pending"}</li>
       {/each}
     {/key}
   {:else}...loading{/if}
