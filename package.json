@@ -4,6 +4,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
+    "start:dev": "node hypnsServer.js",
     "start": "npm run build && node hypnsServer.js"
   },
   "devDependencies": {
@@ -23,7 +24,7 @@
     "express": "^4.17.1",
     "fs-extra": "^9.0.1",
     "hyperswarm-web": "^2.1.1",
-    "hypns": "^2.0.2",
+    "hypns": "^2.0.4",
     "lowdb": "^1.0.0"
   },
   "license": "MIT-with-Commons-Clause",
