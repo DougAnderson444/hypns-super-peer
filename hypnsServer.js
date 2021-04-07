@@ -20,12 +20,15 @@ fs.ensureFileSync(file)
 const adapter = new FileSync('.data/db.json')
 const db = low(adapter)
 // Set some defaults
-if (db.get('pins').size().value() < 1) { db.defaults({ pins: {} }).write() }
+if (db.get('pins').size().value() < 1) db.defaults({ pins: {} }).write()
 
 /**
  * HYPNS Node and functions
  */
-const hypnsNode = new HyPNS({ persist: true, applicationName: '.data/hypnsapp' })
+const hypnsNode = new HyPNS({
+  persist: true,
+  applicationName: '.data/hypnsapp'
+})
 const instances = new Map()
 
 const setUp = async (publicKey) => {
@@ -50,7 +53,9 @@ const setUp = async (publicKey) => {
 
   instances.set(instance.publicKey, instance)
   db.set(`pins.${publicKey}`, instance.latest).write()
-  const note = `** Setup COMPLETE: ', ${instance.publicKey}, pins.size: [${db.get('pins').size().value()}]`
+  const note = `** Setup COMPLETE: ', ${instance.publicKey}, pins.size: [${
+    db.get('pins').size().value()
+  }]`
   console.log(note)
   // feedEmitter.emit('feed', note)
   return instance.latest
@@ -60,7 +65,9 @@ const setUp = async (publicKey) => {
 const init = async () => {
   await hypnsNode.init() // sets up the corestore-networker / hyperswarm instance
 
+
   const pins = db.get('pins').value() // Find all publicKeys pinned in the collection
+
   Object.keys(pins).forEach((key) => {
     setUp(key)
   })
@@ -73,6 +80,7 @@ init()
  */
 const app = express()
 const port = process.env.PORT || 3001
+const server = require('http').createServer(app)
 
 app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, '/public')))
@@ -112,6 +120,7 @@ function verifyToken (req, res, next) {
 
 app.get('/pins', (request, response) => {
   const pins = db.get('pins').value() // Find all publicKeys pinned in the collection
+
   response.json(pins) // sends pins back to the page
 })
 /**
@@ -124,10 +133,13 @@ app.get('/feed', (req, res) => {
   res.setHeader('Connection', 'keep-alive')
   res.flushHeaders() // flush the headers to establish SSE with client
 
+
   const counter = 0
   const pinsWriter = () => {
     res.write('event: update\n\n') // res.write() instead of res.send()
+
     res.write(`data: ${JSON.stringify(db.get('pins').value())}\n\n`) // res.write() instead of res.send()
+
     res.write(`id: ${counter}\n\n`)
   }
   // const interValID = setInterval(writeCounter, 1000)
@@ -151,7 +163,9 @@ app.post('/deploy', (request, response) => {
   }
 
   if (request.body.ref !== 'refs/heads/master') {
-    response.status(200).send('Push was not to master branch, so did not deploy.')
+    response.status(200).send(
+      'Push was not to master branch, so did not deploy.'
+    )
     return
   }
 
@@ -171,11 +185,11 @@ app.post('/deploy', (request, response) => {
   response.status(200).send()
 })
 
-const listener = app.listen(port, () => {
-  console.log('Server is up at ', listener.address())
-})
-
 /**
     * Also set up a hyperswarm-web proxy server for when this is run at home
     */
-proxy() // { network: hypnsNode.swarmNetworker.swarm } // TODO: debug TypeError: this.network.bind is not a function
+proxy({ server }) // { network: hypnsNode.swarmNetworker.swarm } // TODO: debug TypeError: this.network.bind is not a function
+
+const listener = app.listen(port, () => {
+  console.log('Server is up at ', listener.address())
+})
