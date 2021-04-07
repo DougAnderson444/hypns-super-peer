@@ -65,7 +65,6 @@ const setUp = async (publicKey) => {
 const init = async () => {
   await hypnsNode.init() // sets up the corestore-networker / hyperswarm instance
 
-
   const pins = db.get('pins').value() // Find all publicKeys pinned in the collection
 
   Object.keys(pins).forEach((key) => {
@@ -80,7 +79,6 @@ init()
  */
 const app = express()
 const port = process.env.PORT || 3001
-const server = require('http').createServer(app)
 
 app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, '/public')))
@@ -133,13 +131,10 @@ app.get('/feed', (req, res) => {
   res.setHeader('Connection', 'keep-alive')
   res.flushHeaders() // flush the headers to establish SSE with client
 
-
   const counter = 0
   const pinsWriter = () => {
     res.write('event: update\n\n') // res.write() instead of res.send()
-
     res.write(`data: ${JSON.stringify(db.get('pins').value())}\n\n`) // res.write() instead of res.send()
-
     res.write(`id: ${counter}\n\n`)
   }
   // const interValID = setInterval(writeCounter, 1000)
@@ -188,6 +183,7 @@ app.post('/deploy', (request, response) => {
 /**
     * Also set up a hyperswarm-web proxy server for when this is run at home
     */
+const server = require('http').createServer(app)
 proxy({ server }) // { network: hypnsNode.swarmNetworker.swarm } // TODO: debug TypeError: this.network.bind is not a function
 
 const listener = app.listen(port, () => {

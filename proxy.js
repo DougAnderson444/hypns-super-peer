@@ -1,16 +1,12 @@
 const HyperswarmServer = require('hyperswarm-web/server')
-const http = require('http')
-const send = require('send')
-const path = require('path')
 const DEFAULT_PORT = 4977 // HYPR on a cellphone keypad
 
 // const HyperspaceClient = require('@hyperspace/client')
 
-const INDEX_HTML_LOCATION = path.join(__dirname, 'index.html')
-
-module.exports = async (network = {}, port = DEFAULT_PORT) => {
+module.exports = async (params) => {
+  const { server, port = DEFAULT_PORT, network = {} } = params
   // If there is a Hyperspace daemon running, use that for the network
-  const opts = {}
+  const opts = {} // needs to be empty because https://github.com/hypercore-protocol/hyperspace-rpc/pull/11
 
   /**
    * Hyperswarm-web fails on Hyperspace's network instance for some reason.
@@ -44,11 +40,6 @@ module.exports = async (network = {}, port = DEFAULT_PORT) => {
   // } catch (error) {
   //   console.error('hyperspace client error', error)
   // }
-
-  const server = http.createServer(function onRequest (req, res) {
-    send(req, INDEX_HTML_LOCATION)
-      .pipe(res)
-  })
 
   const wsServer = new HyperswarmServer(opts) // { network }
 
