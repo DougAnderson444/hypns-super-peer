@@ -1,6 +1,6 @@
 {
   "name": "hypns-super-peer",
-  "version": "4.1.3",
+  "version": "4.2.0",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
@@ -22,10 +22,13 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "express-ws": "^5.0.2",
     "fs-extra": "^9.0.1",
+    "hyperswarm-proxy-ws": "^1.2.0",
     "hyperswarm-web": "^2.1.1",
     "hypns": "^2.0.5",
-    "lowdb": "^1.0.0"
+    "lowdb": "^1.0.0",
+    "websocket-stream": "^5.5.2"
   },
   "license": "MIT-with-Commons-Clause",
   "bugs": {
