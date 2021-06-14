@@ -6,9 +6,13 @@ const fs = require('fs-extra')
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
 const express = require('express')
+const expressWebSocket = require('express-ws');
+const websocketStream = require('websocket-stream/stream');
+
 const bodyParser = require('body-parser')
 const cors = require('cors')
 
+const HyperswarmExpress = require('./hyperswarm-express')
 const proxy = require('./proxy')
 const { execSync } = require('child_process')
 
@@ -83,6 +87,18 @@ const port = process.env.PORT || 3001
 app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, '/public')))
 app.use(cors())
+
+// extend express app with app.ws()
+// for hyperswarm-web proxy server
+expressWebSocket(app, null, {
+    // ws options here
+    perMessageDeflate: false,
+});
+
+// setup HyperswarmExpress instance for app.ws()
+// TODO: ideally we'd want to use the same network instance as hypnsNode, or hyperspace, instead of creating new separate new one
+const opts = {} // { network: hypnsNode.swarmNetworker.swarm } // TODO: debug TypeError: this.network.bind is not a function
+const wsExpress = new HyperswarmExpress(opts) 
 
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, '/public', 'index.html'))
@@ -181,11 +197,21 @@ app.post('/deploy', (request, response) => {
 })
 
 /**
-    * Also set up a hyperswarm-web proxy server for when this is run at home
-    */
-const server = require('http').createServer(app)
-proxy({ server }) // { network: hypnsNode.swarmNetworker.swarm } // TODO: debug TypeError: this.network.bind is not a function
+  * Also set up a hyperswarm-web proxy server
+  */
+app.ws('/proxy', function(ws, req) {
+
+  // convert ws instance to stream
+  const stream = websocketStream(ws, {
+    // websocket-stream options here
+    binary: true,
+  });
+
+  // now handle this stream through hyperswarm-web & hyperswarm-proxy-ws
+  wsExpress.handleStream(stream)
+});
 
 const listener = app.listen(port, () => {
   console.log('Server is up at ', listener.address())
+  console.log(`hyperswarm-web available at ws://localhost:${listener.address().port}/proxy` )
 })
